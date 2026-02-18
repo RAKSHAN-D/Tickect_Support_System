@@ -1,0 +1,45 @@
+services:
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: support_ticket_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "rakshan@SDM069"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=support_ticket_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=rakshan@SDM069
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+
+volumes:
+  postgres_data:

@@ -1,0 +1,7 @@
+django==4.2.28
+djangorestframework
+django-cors-headers
+psycopg2-binary
+python-dotenv
+google-genai
+openai
